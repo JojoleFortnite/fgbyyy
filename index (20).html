@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TON TOP 30 BALLON D&#39;OR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d12;--panel:#17171f;--card:#1e1e28;--line:#2c2c3a;--text:#f4f1ea;--muted:#8d8d9b;--gold:#d4af37;--gold2:#f3d77a;--blue:#6fa8ff;--serif:"Playfair Display",Georgia,serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f6f3ec;--panel:#fff;--card:#fff;--line:#e5dfd1;--text:#1d1b16;--muted:#77716a;--gold:#b8901f;--gold2:#8a6a12;--blue:#2d63c8}}
+:root[data-theme="light"]{--bg:#f6f3ec;--panel:#fff;--card:#fff;--line:#e5dfd1;--text:#1d1b16;--muted:#77716a;--gold:#b8901f;--gold2:#8a6a12;--blue:#2d63c8}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,rgba(212,175,55,.12),transparent),var(--bg);color:var(--text);font-family:var(--sans);line-height:1.45;min-height:100vh}
+header{text-align:center;padding:40px 16px 16px}
+.kicker{letter-spacing:.3em;text-transform:uppercase;font-size:.7rem;color:var(--gold);font-weight:600}
+h1{font-family:var(--serif);font-size:clamp(1.9rem,5vw,2.8rem);margin:8px 0 6px;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{color:var(--muted);margin:0;font-size:.95rem}
+main{max-width:680px;margin:0 auto;padding:12px 16px 60px}
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px 0;background:none}
+button{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--gold)}
+button.primary{background:linear-gradient(90deg,var(--gold),var(--gold2));border-color:transparent;color:#1a1400;font-weight:600}
+button:disabled{opacity:.4;cursor:default}
+.legend{text-align:center;color:var(--muted);font-size:.78rem;margin:4px 0 14px}
+ol{list-style:none;padding:0;margin:0}
+li{display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:7px;user-select:none;transition:transform .15s,border-color .15s,box-shadow .15s;box-shadow:0 1px 0 rgba(255,255,255,.03) inset}
+li:hover{border-color:var(--gold);box-shadow:0 6px 24px -12px rgba(212,175,55,.5)}
+li.dragging{opacity:.4}
+li.over{border-color:var(--gold);transform:scale(1.01)}
+.rank{font-family:var(--serif);font-size:1.3rem;font-weight:700;min-width:34px;text-align:center;color:var(--gold);line-height:1;padding-top:2px}
+.rank.top{color:var(--gold2);text-shadow:0 0 18px rgba(212,175,55,.45)}
+.body{flex:1;min-width:0}
+.name{font-weight:600;font-size:.88rem}
+.club{display:block;font-size:.7rem;color:var(--muted);font-weight:400;margin-top:1px}
+.stats{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.stats span{font-size:.64rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+.stats b{color:var(--text);font-weight:600}
+.trophies{font-size:.68rem;color:var(--gold);margin-top:5px;line-height:1.4}
+.indiv{font-size:.68rem;color:var(--blue);margin-top:2px;line-height:1.4}
+.arrows{display:flex;flex-direction:column;gap:4px}
+.arrows button{padding:0 9px;font-size:.7rem;line-height:1.5;border-radius:8px}
+.handle{touch-action:none;cursor:grab;color:var(--muted);font-size:1rem;align-self:center;opacity:.6}
+.result li{cursor:default}
+.result li:hover{transform:none}
+.podium-title{font-family:var(--serif);text-align:center;font-size:1.5rem;margin:8px 0 14px}
+.compact li{padding:11px 13px;margin-bottom:8px;gap:12px;border-radius:12px}
+.compact .stats,.compact .trophies,.compact .indiv,.compact .club{display:none}
+.compact .rank{font-size:1.35rem;min-width:36px}
+.compact .name{font-size:1rem}
+.compact .arrows button{padding:0 6px;font-size:.6rem}
+.compact .handle{font-size:1.05rem}
+ol#list{display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px}
+ol#list li{flex:0 0 min(380px,100%);box-sizing:border-box}
+body.one-col ol#list li{flex:0 0 100%}
+main{width:min(76vw,1800px);max-width:1800px;margin:0 auto;padding-left:0;padding-right:0}
+.compact .arrows{display:none}
+.compact li{cursor:pointer}
+.compact li.open .stats,.compact li.open .trophies,.compact li.open .indiv,.compact li.open .club{display:block}
+.compact li.open{padding:11px 13px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px}
+.icon-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8}
+.icon-btn.on{border-color:var(--gold);color:var(--gold)}
+body.one-col ol#list{grid-template-columns:1fr!important}
+body.one-col main{max-width:960px}
+.cmp{font-size:.7rem;color:var(--muted);margin-top:4px}
+.cmp-total{text-align:center;color:var(--muted);font-size:.85rem;margin:0 0 12px}
+.bigpts{margin-left:auto;align-self:center;text-align:right;font-family:var(--serif);font-size:1.7rem;font-weight:700;color:var(--gold);min-width:70px;line-height:1}
+.bigpts small{display:block;font-family:var(--sans);font-size:.6rem;font-weight:500;color:var(--muted);margin-top:4px;letter-spacing:.05em}
+.hidden{display:none!important}
+@media (max-width:480px){.handle{display:none}li{gap:10px;padding:12px}.rank{min-width:34px;font-size:1.4rem}}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Saison 2025-2026</div>
+  <h1>Ballon d'Or 2026</h1>
+  <p>Classe les 30 nommés du plus fort au moins fort</p>
+</header>
+<main>
+  <div class="toolbar" id="bar">
+    <button id="viewToggle" class="icon-btn" title="Changer de vue" aria-label="Changer de vue"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <button id="compactBtn">Vue compacte</button>
+    <button id="reset">Réinitialiser</button>
+    <button class="primary" id="validate">Valider mon classement</button>
+  </div>
+  <p class="legend" id="legend">M : matchs · B : buts · PD : passes décisives</p>
+  <ol id="list"></ol>
+  <div id="result" class="hidden">
+    <h2 class="podium-title">Ton classement final</h2>
+    <ol class="result" id="final"></ol>
+    <div class="toolbar">
+      <button id="copy">Copier mon classement</button>
+      <button id="back">Modifier</button>
+    </div>
+  </div>
+</main>
+<script>
+const PLAYERS = [
+  ["Jude Bellingham","Real Madrid / Angleterre",52,15,6],
+  ["Pau Cubarsí","FC Barcelone / Espagne",62,1,2],
+  ["Marc Cucurella","Real Madrid / Espagne",65,2,7],
+  ["Ousmane Dembélé","PSG / France",51,26,14],
+  ["Luis Díaz","Bayern Munich / Colombie",66,30,23],
+  ["Bruno Fernandes","Manchester United / Portugal",51,13,25],
+  ["Gabriel","Arsenal / Brésil",59,4,6],
+  ["Erling Haaland","Manchester City / Norvège",64,58,11],
+  ["Achraf Hakimi","PSG / Maroc",49,4,17],
+  ["Harry Kane","Bayern Munich / Angleterre",65,73,8],
+  ["Khvicha Kvaratskhelia","PSG / Géorgie",57,24,10],
+  ["Lamine Yamal","FC Barcelone / Espagne",57,25,20],
+  ["Marquinhos","PSG / Brésil",43,2,0],
+  ["Lautaro Martínez","Inter / Argentine",55,30,10],
+  ["Lionel Messi","Inter Miami / Argentine",49,45,30],
+  ["Kylian Mbappé","Real Madrid / France",60,58,13],
+  ["Nuno Mendes","PSG / Portugal",53,7,8],
+  ["João Neves","PSG / Portugal",49,11,4],
+  ["Michael Olise","Bayern Munich / France",69,27,35],
+  ["Willian Pacho","PSG / Équateur",56,2,1],
+  ["Julián Quiñones","Al Qadsiah / Mexique",46,41,5],
+  ["Declan Rice","Arsenal / Angleterre",69,8,14],
+  ["Rodri","FC Barcelone / Espagne",46,2,0],
+  ["William Saliba","Arsenal / France",60,1,1],
+  ["Dayot Upamecano","Bayern Munich / France",58,2,4],
+  ["Ferran Torres","PSG / Espagne",65,25,7],
+  ["Vinícius Jr","Real Madrid / Brésil",66,28,16],
+  ["Vitinha","PSG / Portugal",64,7,10],
+  ["Fabián Ruiz","PSG / Espagne",45,3,6],
+  ["Sadio Mané","Al Nassr / Sénégal",55,24,13]
+];
+
+const TROPHIES = {
+  "Sadio Mané": ["Saudi Pro League"],
+  "João Neves": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Coupe intercontinentale","Trophée des Champions"],
+  "Khvicha Kvaratskhelia": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Coupe intercontinentale","Trophée des Champions"],
+  "Michael Olise": ["Bundesliga","Coupe d'Allemagne","Supercoupe d'Allemagne"],
+  "Harry Kane": ["Bundesliga","Coupe d'Allemagne","Supercoupe d'Allemagne"],
+  "William Saliba": ["Premier League"],
+  "Lautaro Martínez": ["Coppa Italia"],
+  "Erling Haaland": ["FA Cup","EFL Cup"],
+  "Declan Rice": ["Premier League"],
+  "Pau Cubarsí": ["Liga","Supercoupe d'Espagne","Coupe du monde"],
+  "Lamine Yamal": ["Liga","Supercoupe d'Espagne","Coupe du monde"],
+  "Rodri": ["FA Cup","EFL Cup","Coupe du monde"],
+  "Fabián Ruiz": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Trophée des Champions","Coupe intercontinentale","Coupe du monde"],
+  "Achraf Hakimi": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Trophée des Champions","Coupe intercontinentale","Coupe d'Afrique des nations"],
+  "Gabriel": ["Premier League"],
+  "Ousmane Dembélé": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Coupe intercontinentale","Trophée des Champions"],
+  "Luis Díaz": ["Bundesliga","Coupe d'Allemagne","Supercoupe d'Allemagne"],
+  "Lionel Messi": ["MLS"],
+  "Marquinhos": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Coupe intercontinentale","Trophée des Champions"],
+  "Willian Pacho": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Coupe intercontinentale","Trophée des Champions"],
+  "Nuno Mendes": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Coupe intercontinentale","Trophée des Champions"],
+  "Ferran Torres": ["Liga","Supercoupe d'Espagne","Coupe du monde"],
+  "Dayot Upamecano": ["Bundesliga","Coupe d'Allemagne","Supercoupe d'Allemagne"],
+  "Marc Cucurella": ["Coupe du monde"],
+  "Vitinha": ["Ligue des champions","Ligue 1","Supercoupe d'Europe","Trophée des Champions","Coupe intercontinentale"]
+};
+
+const INDIVIDUAL = {
+  "Khvicha Kvaratskhelia": ["Meilleur joueur de la Ligue des champions"],
+  "Achraf Hakimi": ["Ballon d'Or africain"],
+  "Sadio Mané": ["Meilleur joueur de la CAN 2025"],
+  "Ousmane Dembélé": ["Plus beau but de Ligue 1","Meilleur joueur de Ligue 1"],
+  "Lautaro Martínez": ["Meilleur attaquant de Série A","Meilleur buteur Série A (Capocannoniere)"],
+  "Bruno Fernandes": ["Meilleur passeur de Premier League","Meilleur joueur de Premier League"],
+  "Julián Quiñones": ["Meilleur buteur Saudi Pro League (Golden Boot)"],
+  "Rodri": ["Meilleur joueur de la Coupe du monde"],
+  "Pau Cubarsí": ["Meilleur jeune de la Coupe du monde"],
+  "Kylian Mbappé": ["Soulier d'Or Coupe du monde","Soulier d'Or Ligue des champions","Meilleur buteur Liga (Pichichi)"],
+  "Michael Olise": ["Meilleur joueur de Bundesliga"],
+  "Harry Kane": ["Soulier d'Or Européen","Meilleur buteur Bundesliga (Torjägerkanone)"],
+  "Erling Haaland": ["Soulier d'Or Premier League"],
+  "Lamine Yamal": ["Meilleur joueur de la Liga"]
+};
+
+let order = PLAYERS.map((_, i) => i);
+const list = document.getElementById('list');
+const finalList = document.getElementById('final');
+const result = document.getElementById('result');
+let dragIdx = null;
+
+function extras(p) {
+  const name = PLAYERS[p][0];
+  const tr = TROPHIES[name] || [];
+  const ind = INDIVIDUAL[name] || [];
+  let h = '';
+  if (tr.length) h += `<div class="trophies">🏆 ${tr.join(' · ')}</div>`;
+  if (ind.length) h += `<div class="indiv">⭐ ${ind.join(' · ')}</div>`;
+  return h;
+}
+function statsHTML(p) {
+  const [, , m, b, pd] = PLAYERS[p];
+  return `<div class="stats"><span>M <b>${m}</b></span><span>B <b>${b}</b></span><span>PD <b>${pd}</b></span></div>`;
+}
+function row(p, i, editable) {
+  const [name, club] = PLAYERS[p];
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span class="rank ${i < 3 ? 'top' : ''}">${i + 1}</span>
+    <div class="body"><div class="name">${name}<span class="club">${club}</span></div>${statsHTML(p)}${extras(p)}</div>
+    ${editable ? `<span class="arrows">
+      <button data-act="up" aria-label="Monter" ${i === 0 ? 'disabled' : ''}>▲</button>
+      <button data-act="down" aria-label="Descendre" ${i === order.length - 1 ? 'disabled' : ''}>▼</button>
+    </span><span class="handle" aria-hidden="true">⋮⋮</span>` : ''}`;
+  return li;
+}
+function render() {
+  list.innerHTML = '';
+  order.forEach((p, i) => {
+    const li = row(p, i, true);
+    li.dataset.index = i;
+    li.querySelectorAll('button').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      move(i, i + (b.dataset.act === 'up' ? -1 : 1));
+    }));
+    list.appendChild(li);
+  });
+}
+function move(from, to) {
+  if (from == null || to < 0 || to >= order.length || from === to) return;
+  const [item] = order.splice(from, 1);
+  order.splice(to, 0, item);
+  render();
+}
+let dragging = null;
+list.addEventListener('pointerdown', e => {
+  const h = e.target.closest('.handle');
+  if (!h) return;
+  const li = h.closest('li');
+  if (!li) return;
+  e.preventDefault();
+  dragging = Number(li.dataset.index);
+  li.classList.add('dragging');
+  h.setPointerCapture(e.pointerId);
+});
+list.addEventListener('pointermove', e => {
+  if (dragging == null) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const li = el && el.closest('li');
+  if (!li || !list.contains(li)) return;
+  const to = Number(li.dataset.index);
+  if (to !== dragging) {
+    move(dragging, to);
+    dragging = to;
+  }
+});
+function endDrag() { dragging = null; }
+list.addEventListener('pointerup', endDrag);
+list.addEventListener('pointercancel', endDrag);
+
+function shuffle() {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  render();
+}
+const POINTS = [161,151,141,132,123,114,106,98,90,83,76,69,63,57,51,45,40,35,30,26,22,18,15,12,9,7,5,3,2,1];
+let avgPts = null;
+let totalVotes = 0;
+let status = '';
+async function saveAndCompare() {
+  try {
+    const db = await claude.use("db");
+    if (!db) { status = 'Classement moyen indisponible : connecte-toi à Claude pour le voir.'; return; }
+    await db.collection("ballots").add({ ranks: order.map(p => PLAYERS[p][0]), at: Date.now() });
+    const snap = await db.collection("ballots").get();
+    const sums = {};
+    let n = 0;
+    snap.docs.forEach(d => {
+      const r = (d.data() || {}).ranks;
+      if (!Array.isArray(r)) return;
+      n++;
+      r.forEach((name, i) => { sums[name] = (sums[name] || 0) + POINTS[i]; });
+    });
+    avgPts = {};
+    Object.keys(sums).forEach(name => { avgPts[name] = sums[name] / n; });
+    totalVotes = n;
+    status = '';
+  } catch (e) {
+    avgPts = null;
+    status = 'Classement moyen indisponible : ' + ((e && (e.code || e.message)) || 'erreur inconnue');
+  }
+}
+function renderFinal() {
+  finalList.innerHTML = '';
+  let items = order.slice();
+  if (avgPts) {
+    items.sort((x, y) => (avgPts[PLAYERS[y][0]] || 0) - (avgPts[PLAYERS[x][0]] || 0));
+  }
+  items.forEach((p, i) => {
+    const li = row(p, i, false);
+    const name = PLAYERS[p][0];
+    const big = document.createElement('div');
+    big.className = 'bigpts';
+    if (avgPts) {
+      big.innerHTML = `${(avgPts[name] || 0).toFixed(1)}<small>pts moy.</small>`;
+    } else {
+      big.innerHTML = `${POINTS[order.indexOf(p)]}<small>pts</small>`;
+    }
+    li.appendChild(big);
+    finalList.appendChild(li);
+  });
+  let total = document.getElementById('cmpTotal');
+  if (!total) {
+    total = document.createElement('p');
+    total.id = 'cmpTotal';
+    total.className = 'cmp-total';
+    finalList.parentNode.insertBefore(total, finalList);
+  }
+  total.textContent = avgPts
+    ? `Classement moyen de ${totalVotes} participant${totalVotes > 1 ? 's' : ''}`
+    : status;
+}
+function showResult() {
+  document.getElementById('bar') && document.getElementById('bar').classList.add('hidden');
+  document.getElementById('legend').classList.add('hidden');
+  list.classList.add('hidden');
+  result.classList.remove('hidden');
+  renderFinal();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  saveAndCompare().then(renderFinal);
+}
+document.getElementById('reset').onclick = () => { order = PLAYERS.map((_, i) => i); render(); };
+document.getElementById('validate').onclick = showResult;
+document.getElementById('back').onclick = () => {
+  result.classList.add('hidden');
+  list.classList.remove('hidden');
+  document.getElementById('bar').classList.remove('hidden');
+  document.getElementById('legend').classList.remove('hidden');
+};
+document.getElementById('copy').onclick = () => {
+  const txt = "Mon Ballon d'Or 2026 :\n" + order.map((p, i) => `${i + 1}. ${PLAYERS[p][0]}`).join('\n');
+  if (navigator.clipboard) navigator.clipboard.writeText(txt);
+  document.getElementById('copy').textContent = 'Copié !';
+};
+document.getElementById('compactBtn').onclick = e => {
+  const on = document.body.classList.toggle('compact');
+  e.currentTarget.textContent = on ? 'Vue détaillée' : 'Vue compacte';
+};
+list.addEventListener('click', e => {
+  if (e.target.closest('.handle, .arrows')) return;
+  const li = e.target.closest('li');
+  if (!li || !document.body.classList.contains('compact')) return;
+  li.classList.toggle('open');
+});
+const vToggle = document.getElementById('viewToggle');
+vToggle.onclick = () => {
+  const toList = document.body.classList.toggle('one-col');
+  vToggle.innerHTML = toList ? `<svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>` : `<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`;
+  vToggle.title = toList ? 'Vue grille' : 'Vue liste';
+  vToggle.setAttribute('aria-label', vToggle.title);
+};
+render();
+</script>
+</body>
+</html>
